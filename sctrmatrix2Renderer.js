@@ -289,7 +289,7 @@ var ScatterMatrix2Renderer = VisualizationRendererBase.extend({
               domain = [d3.min(data, value), d3.max(data, value)],
               range_x = [padding / 2, size - padding / 2],
               range_y = [padding / 2, size - padding / 2];
-
+              debugger;
           x[trait] = d3.scale.linear().domain(domain).range(range_x);
           y[trait] = d3.scale.linear().domain(domain).range(range_y.reverse());
         });
