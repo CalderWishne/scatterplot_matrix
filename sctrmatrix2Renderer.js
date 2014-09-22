@@ -6,7 +6,6 @@ var ScatterMatrix2Renderer = VisualizationRendererBase.extend({
   },
 
   visualizationPostQuery: function (data) {
-
     var recs = data.dataModelMap.data.records;
     var vispostqueryself = this;
 
@@ -76,7 +75,7 @@ var ScatterMatrix2Renderer = VisualizationRendererBase.extend({
           if (isNaN(+data[0][k])) { string_variables.push(k); }
           else { numeric_variables.push(k); numeric_variable_values[k] = []; }
         }
-        // debugger;
+
         data.forEach(function(d) {
           //////////////////////////////
           //////////////////////////////////
@@ -289,11 +288,9 @@ var ScatterMatrix2Renderer = VisualizationRendererBase.extend({
               domain = [d3.min(data, value), d3.max(data, value)],
               range_x = [padding / 2, size - padding / 2],
               range_y = [padding / 2, size - padding / 2];
-              debugger;
           x[trait] = d3.scale.linear().domain(domain).range(range_x);
           y[trait] = d3.scale.linear().domain(domain).range(range_y.reverse());
         });
-
         // When drilling, user select one or more variables. The first drilled
         // variable becomes the x-axis variable for all columns, and each column
         // contains only data points that match specific values for each of the
@@ -437,7 +434,6 @@ var ScatterMatrix2Renderer = VisualizationRendererBase.extend({
             .text(function(d) { return d.y; });
 
         function plot(p) {
-          // console.log(p);
 
           var data_to_draw = data;
 
@@ -448,7 +444,9 @@ var ScatterMatrix2Renderer = VisualizationRendererBase.extend({
           if (drill_variables.length > 1) {
             var column = p.i;
 
-            var cap = 1;
+            var cap = 1;x
+
+
             for (var i=drill_variables.length-1; i > 0; i--) {
               var var_name = drill_variables[i];
               var var_value = undefined;
@@ -482,16 +480,26 @@ var ScatterMatrix2Renderer = VisualizationRendererBase.extend({
               .attr("x", padding / 2)
               .attr("y", padding / 2)
               .attr("width", size - padding)
+              .attr("cursor", "default")
               .attr("height", size - padding);
 
           // Scatter plot dots
           cell.selectAll("circle")
               .data(data_to_draw)
-            .enter().append("svg:circle")
+              .enter().append("svg:circle")
               .attr("class", function(d) { return color_class(d); })
-              .attr("cx", function(d) { return x[p.x](d[p.x]); })
-              .attr("cy", function(d) { return y[p.y](d[p.y]); })
-              .attr("r", 5);
+              .attr("cx", function(d) { 
+                return x[p.x](d[p.x]); 
+              })
+              .attr("cy", function(d) { 
+                return y[p.y](d[p.y]); 
+              })
+              .attr("r", 2)
+              .on("mouseover", function () { 
+                vispostqueryself.showQTipLayer("(" + this.getAttribute("cx") + ", " + this.getAttribute("cy") + ")");
+                //return this; 
+              });
+            
 
           // Add titles for x variables and drill variable values
           if (p.j == y_variables.length-1) {
@@ -516,6 +524,7 @@ var ScatterMatrix2Renderer = VisualizationRendererBase.extend({
 
           // Brush
           cell.call(brush.x(x[p.x]).y(y[p.y]));
+          self.highlightAxes();
         }
 
         // Clear the previously-active brush, if any
@@ -552,7 +561,24 @@ var ScatterMatrix2Renderer = VisualizationRendererBase.extend({
 
     };
 
+    ScatterMatrix.prototype.highlightAxes = function () {
+      d3.selectAll("g line").each(function () {
+        debugger;
+        if (this.nextSibling.innerHTML == "0") {
+          this.style.stroke = "black"
+          this.style["stroke-width"] = "2px";
+        }
+      });
+    };
+
     var sm = new ScatterMatrix();
     sm.render();
+
+    // d3.selectAll("g line").each(function () {
+    //   debugger;
+    //   if (this.nextSibling.innerHTML == "0") {
+    //     this.style.stroke = "red";
+    //   }
+    // });
   }
 });
