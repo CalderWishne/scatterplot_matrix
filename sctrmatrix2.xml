@@ -1,0 +1,43 @@
+<?xml version="1.0"?>
+<!DOCTYPE visualization-definition SYSTEM "visualization.dtd">
+
+<visualization-definition>
+	<visualization disabled="false" type="sctrmatrix2" name="sctrmatrix2" displayName="Scatterplot Matrix 2">
+		<renderer-class>ScatterMatrix2Renderer</renderer-class>
+		<javascript-resource>/js/renderers/sctrmatrix2Renderer.js</javascript-resource>
+	</visualization>	
+	<queries>
+		<preference name="eqlqueryvisualization" validators="requiredAction" resourceKey="visualization.edit.eqlqueryvisualization" rows="20" order="0">
+		<![CDATA[
+RETURN data AS
+SELECT  
+'sepal length' as sepalLength,
+'sepal width' as sepalWidth,
+'petal length' as petalLength,
+'petal width' as petalWidth,
+species
+FROM base
+		]]>
+		</preference>
+	</queries>
+	<default-preferences>
+  	<preference name="numAttributeSets">1</preference>
+		<preference name="metricOptions_1" validators="requiredAction" resourceKey="visualization.edit.metric_1"></preference>
+		<preference name="groupbyOptions_1" validators="requiredAction" resourceKey="visualization.edit.groupby_1"></preference>
+		<preference name="token_dynamic">
+<![CDATA[
+%sort%|sort|%groupby_1%
+]]>			
+		</preference>
+		<preference name="dataColumns">
+<![CDATA[
+%groupby_1%:%groupby_1%|%metric_1%:%metric_1% %filter_1%	
+]]>			
+		</preference>	
+	</default-preferences>
+	<custom-preferences>
+		<preference-group name="Custom Preferences">
+			<preference name="customPreference" displayName="Custom Preference">Default value</preference>	
+		</preference-group>
+	</custom-preferences>
+</visualization-definition>
