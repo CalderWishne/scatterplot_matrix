@@ -1,18 +1,3 @@
-var ScatterMatrix2Renderer = VisualizationRendererBase.extend({
-
-  reload: function () {
-    d3.select('#' + this.viewshell).selectAll("svg, div").remove();
-    this.queryWithActiveGroupby();
-  },
-
-  visualizationPostQuery: function (data) {
-    var recs = data.dataModelMap.data.records;
-    var sm = new ScatterMatrix(recs, this.viewshell);
-    sm.render();
-  }
-
-});
-
 ScatterMatrix = function(recs, dom_id) {
   var recs = recs;
 
