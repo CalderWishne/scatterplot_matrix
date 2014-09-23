@@ -7,29 +7,27 @@ var ScatterMatrix2Renderer = VisualizationRendererBase.extend({
 
   visualizationPostQuery: function (data) {
     var recs = data.dataModelMap.data.records;
-    var sm = new ScatterMatrix(recs, this.viewshell);
+    var sm = new ScatterMatrix(recs, this.viewshell, this);
     sm.render();
   }
 
 });
 
-ScatterMatrix = function(recs, dom_id) {
+ScatterMatrix = function(recs, dom_id, endecaContext) {
   var recs = recs;
+  var context = endecaContext;
+
+  this.getContext = function () {
+    return context;
+  }
 
   this.getRecs = function () {
     return recs;
   }
-// ScatterMatrix = function(url, data, dom_id) {
-  // this.__url = url;
+
   if (recs === undefined || recs === null) { this.__data = undefined; }
-  /////////////////////////////////////
-
-  //////////////////////////////////////
   else { this.__data = recs }
-  // else { this.__data = d3.csv.parse(data); }
-  ///////////////////////////////////
 
-  ////////////////////////////////////
   this.__cell_size = 140;
   if (dom_id === undefined) { this.__dom_id = 'body'; }
   else { this.__dom_id = "#"+ dom_id; }
@@ -43,19 +41,13 @@ ScatterMatrix.prototype.cellSize = function(n) {
 ScatterMatrix.prototype.onData = function(cb) {
   if (this.__data) { cb(); return; }
   var self = this;
-  //d3.csv(self.__url, function(data) {
     self.__data = this.getRecs();
- 
     cb();
-  //});
 };
 
 ScatterMatrix.prototype.render = function () {
   var self = this;
-  ////////////////////////////////////////////
-  ///////////////////////////////////////////
   var container = d3.select(this.__dom_id)
-  // var container = d3.select(this.__dom_id).append('div')
                     .attr('class', 'scatter-matrix-container');
   var svg = container.append('div')
                      .attr('class', 'scatter-matrix-svg')
@@ -64,6 +56,7 @@ ScatterMatrix.prototype.render = function () {
   var control = container.append('div')
                          .attr('class', 'scatter-matrix-control');
 
+  var color_variable_context = undefined;
 
   this.onData(function() {
     var data = self.__data;
@@ -79,11 +72,7 @@ ScatterMatrix.prototype.render = function () {
     }
 
     data.forEach(function(d) {
-      //////////////////////////////
-      //////////////////////////////////
-      for(var j = 0; j < numeric_variables.length - 1; j++) {//must allow for 'remove'
-        //function artifact that comes from d3.csv output
-      // for (var j in numeric_variables) {
+      for(var j = 0; j < numeric_variables.length - 1; j++) {
         var k = numeric_variables[j];
         var value = d[k];
         if (numeric_variable_values[k].indexOf(value) < 0) {
@@ -228,7 +217,7 @@ ScatterMatrix.prototype.render = function () {
                self.__draw(self.__cell_size, svg, color_variable, selected_colors, to_include, drill_variables);
              });
     drill_li.append('label')
-            .html(function(d) { return d; });//+' ('+numeric_variable_values[d].length+')'; });
+            .html(function(d) { return d; });
 
     self.__draw(self.__cell_size, svg, color_variable, selected_colors, to_include, drill_variables);
   });
@@ -418,11 +407,11 @@ ScatterMatrix.prototype.__draw =
         .attr("class", "y axis")
         .attr("transform", function(d, i) { return "translate(0," + i * size + ")"; })
         .each(function(d) { d3.select(this).call(y_axis.scale(y[d]).orient("right")); });
-
     // Draw scatter plot
     var cell = svg.selectAll("g.cell")
         .data(cross(x_variables, y_variables))
       .enter().append("svg:g")
+        // .on("mouseover", function () { console.log(this); })
         .attr("class", "cell")
         .attr("transform", function(d) { return "translate(" + d.i * size + "," + d.j * size + ")"; })
         .each(plot);
@@ -436,7 +425,6 @@ ScatterMatrix.prototype.__draw =
         .text(function(d) { return d.y; });
 
     function plot(p) {
-
       var data_to_draw = data;
 
       // If drilling, compute what values of the drill variables correspond to
@@ -478,27 +466,32 @@ ScatterMatrix.prototype.__draw =
 
       // Frame
       cell.append("svg:rect")
-          .attr("class", "frame")
+          .attr("class", "__frame")
           .attr("x", padding / 2)
           .attr("y", padding / 2)
           .attr("width", size - padding)
           .attr("cursor", "default")
           .attr("height", size - padding);
 
+
       // Scatter plot dots
       cell.selectAll("circle")
           .data(data_to_draw)
           .enter().append("svg:circle")
           .attr("class", function(d) { return color_class(d); })
+          .attr("plotted_data", "true")
           .attr("cx", function(d) { 
             return x[p.x](d[p.x]); 
           })
           .attr("cy", function(d) { 
             return y[p.y](d[p.y]); 
           })
-          .attr("r", 5)
-          .on("mouseover", function () { 
-            vispostqueryself.showQTipLayer("(" + this.getAttribute("cx") + ", " + this.getAttribute("cy") + ")");
+          .attr("r", 2)
+          .on("mouseover", function (d) { 
+            if (self.getContext()) {
+              self.getContext().showQTipLayer(p.x + ": " + d[p.x] + ", "
+              + p.y + ": " + d[p.y]);
+            }
             //return this; 
           });
         
@@ -566,10 +559,9 @@ ScatterMatrix.prototype.__draw =
 
 ScatterMatrix.prototype.highlightAxes = function () {
   d3.selectAll("g line").each(function () {
-    debugger;
     if (this.nextSibling.innerHTML == "0") {
-      this.style.stroke = "black"
-      this.style["stroke-width"] = "2px"
+      this.style.stroke = "red"
+      this.style["stroke-width"] = "1px"
     }
   });
 };
