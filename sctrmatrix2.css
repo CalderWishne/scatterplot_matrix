@@ -37,6 +37,7 @@ circle { fill: #ccc; fill-opacity: .5; }
 .scatter-matrix-filter-control ul { list-style: none; padding-left: 10px;}
 .scatter-matrix-variable-control ul { list-style: none; padding-left: 10px;}
 .scatter-matrix-drill-control ul { list-style: none; padding-left: 10px;}
+.scatter-matrix-brush-tooltip ul { list-style: none; padding-left: 10px;}
 
 
 .axis_zero_line line {

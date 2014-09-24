@@ -9,6 +9,7 @@ var ScatterMatrix2Renderer = VisualizationRendererBase.extend({
     var recs = data.dataModelMap.data.records;
     var sm = new ScatterMatrix(recs, this.viewshell, this);
     sm.render();
+    // d3.selectAll('*').on('click', function() { console.log(this);});
   }
 
 });
@@ -82,6 +83,7 @@ ScatterMatrix.prototype.render = function () {
     });
 
     var size_control = control.append('div').attr('class', 'scatter-matrix-size-control');
+    var brush_tooltip = control.append('div').attr('class', 'scatter-matrix-brush-tooltip');
     var color_control = control.append('div').attr('class', 'scatter-matrix-color-control');
     var filter_control = control.append('div').attr('class', 'scatter-matrix-filter-control');
     var variable_control = control.append('div').attr('class', 'scatter-matrix-variable-control');
@@ -91,6 +93,8 @@ ScatterMatrix.prototype.render = function () {
     var to_include = [];
     var color_variable = undefined;
     var selected_colors = undefined;
+    var is_brush = true;
+
     for (var j in numeric_variables) {
       var v = numeric_variables[j];
       to_include.push(v);
@@ -172,6 +176,41 @@ ScatterMatrix.prototype.render = function () {
             set_filter(d);
           });
 
+    var brush_tooltip_arr = ["brush", "tooltip"];
+
+    var brush_tooltip_form= 
+      brush_tooltip.append('form')
+      
+    brush_tooltip_form.append('p')
+      .text('Select brush or tooltip: ');
+
+    brush_tooltip_form.append('label')
+      .attr("for", "brush")
+      .text("Brush");
+
+    brush_tooltip_form.append('input')
+      .attr('type','radio')
+      .attr('name','brush_tooltip')
+      .attr('value','brush')
+      .attr('id', 'brush')
+      .text('brush');
+
+    brush_tooltip_form.append('label')
+      .attr('for', 'tooltip')
+      .text('Tooltip');
+
+    brush_tooltip_form.append('input')
+      .attr('type','radio')
+      .attr('name','brush_tooltip')
+      .attr('value','tooltip')
+      .attr('id', 'tooltip')
+      .text('tooltip');
+
+    brush_tooltip_form.on("change", function () {
+      console.log("form changed");
+      self.__draw(self.__cell_size, svg, color_variable, selected_colors, to_include, drill_variables);
+    });
+
     var variable_li =
       variable_control
         .append('p').text('Include variables: ')
@@ -225,6 +264,7 @@ ScatterMatrix.prototype.render = function () {
 
 ScatterMatrix.prototype.__draw =
   function(cell_size, container_el, color_variable, selected_colors, to_include, drill_variables) {
+    console.log("drawing!!");
   var self = this;
   this.onData(function() {
     var data = self.__data;
@@ -486,12 +526,16 @@ ScatterMatrix.prototype.__draw =
           .attr("cy", function(d) { 
             return y[p.y](d[p.y]); 
           })
-          .attr("r", 2)
+          .attr("r", 5)
           .on("mouseover", function (d) { 
+            var circlethis = this;
+            var color_class = document.querySelector("." + circlethis.getAttribute("class"));
+            var color = getComputedStyle(color_class).fill;
             if (self.getContext()) {
               self.getContext().showQTipLayer(p.x + ": " + d[p.x] + ", "
-              + p.y + ": " + d[p.y]);
+              + p.y + ": " + d[p.y], color, "white");
             }
+            
             //return this; 
           });
         
@@ -517,8 +561,11 @@ ScatterMatrix.prototype.__draw =
         }
       }
 
-      // Brush
-      cell.call(brush.x(x[p.x]).y(y[p.y]));
+      // Enable brush if brush option selected and remove any remaining quicktips.
+      if (d3.select("#brush")[0][0].checked) { 
+        self.getContext().hideQTip();
+        cell.call(brush.x(x[p.x]).y(y[p.y]));
+      }
 
       self.highlightAxes();
     }
