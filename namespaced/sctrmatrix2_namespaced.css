@@ -1,0 +1,60 @@
+svg { font-size: 14px; }
+
+.avf-scatter-matrix-axis { shape-rendering: crispEdges; }
+.avf-scatter-matrix-axis line { stroke: #ddd; stroke-width: 1px; }
+.avf-scatter-matrix-axis path { display: none; }
+.avf-scatter-matrix-axis text { font-size: 0.8em; }
+
+rect.extent { fill: #000; fill-opacity: .125; stroke: #fff; }
+rect.frame { fill: #fff; fill-opacity: .7; stroke: #aaa; }
+
+circle { fill: #ccc; fill-opacity: .5; }
+
+.avf-scatter-matrix-legend circle { fill-opacity: 1; }
+.avf-scatter-matrix-legend text { font-size: 18px; font-style: oblique; }
+
+/*.cell text { pointer-events: none; }*/
+
+.avf-scatter-matrix-color-0  { fill: #800; }
+.avf-scatter-matrix-color-1  { fill: #080; }
+.avf-scatter-matrix-color-2  { fill: #008; }
+.avf-scatter-matrix-color-3  { fill: #440; }
+.avf-scatter-matrix-color-4  { fill: #044; }
+.avf-scatter-matrix-color-5  { fill: #404; }
+.avf-scatter-matrix-color-6  { fill: #400; }
+.avf-scatter-matrix-color-7  { fill: #040; }
+.avf-scatter-matrix-color-8  { fill: #004; }
+.avf-scatter-matrix-color-9  { fill: #cc0; }
+.avf-scatter-matrix-color-10 { fill: #0cc; }
+.avf-scatter-matrix-color-11 { fill: #c0c; }
+.avf-scatter-matrix-color-12 { fill: #880; }
+.avf-scatter-matrix-color-13 { fill: #088; }
+.avf-scatter-matrix-color-14 { fill: #808; }
+.avf-scatter-matrix-color-15 { fill: #c00; }
+.avf-scatter-matrix-color-16 { fill: #0c0; }
+.avf-scatter-matrix-color-17 { fill: #00c; }
+
+.avf-scatter-matrix-filter-control ul { list-style: none; padding-left: 10px;}
+.avf-scatter-matrix-variable-control ul { list-style: none; padding-left: 10px;}
+.avf-scatter-matrix-drill-control ul { list-style: none; padding-left: 10px;}
+.avf-scatter-matrix-brush-tooltip ul { list-style: none; padding-left: 10px;}
+
+
+.axis_zero_line line {
+  stroke: "black";
+  stroke-width: 10px;
+}
+
+g.avf-scatter-matrix-cell {
+ pointer-events: all;
+}
+
+.background {
+ color: yellow;
+}
+
+.avf-scatter-matrix__frame {
+ fill: none; 
+ stroke: black;
+ stroke-width: 1px;
+}
